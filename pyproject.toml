@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "EVESVGRenderer"
+version = "0.1.0"
+description = ""
+authors = ["tunelessly <9685607+tunelessly@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pygraphviz = "^1.11"
+
+[tool.poetry.scripts]
+start = "evesvgrenderer.render:start"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,3 @@
+*.svg
+.vscode
+__pycache__
