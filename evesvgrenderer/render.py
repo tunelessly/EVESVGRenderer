@@ -22,13 +22,16 @@ def init(database_path: str) -> sqlite3.Cursor:
 
 def main(argv):
     database_path = argv[1]
+    print(f"Using database {database_path}")
     cursor = init(database_path)
     regions = cursor.execute(q.allRegionNames).fetchall()
+    count = len(regions)
+    i = 1
 
     for region in regions:
         region_name = region["regionName"]
         region_id = region["regionID"]
-        print(f"Rendering {region_name} {region_id}")
+        print(f"{i}/{count}: Rendering {region_name} {region_id}")
         nodes, edges = getDataForRegion(cursor, region_name)
 
         G = pgv.AGraph(strict=False, directed=False, overlap=False, splines=True)
@@ -50,6 +53,7 @@ def main(argv):
 
         G.layout(prog='neato')
         G.draw(f"output/{region_name}.svg")
+        i+= 1
 
     return 0
 

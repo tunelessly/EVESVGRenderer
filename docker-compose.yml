@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  renderer:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: final
+    volumes:
+      - ./output_docker:${APPDIR}/output
