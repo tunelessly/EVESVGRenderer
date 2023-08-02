@@ -30,6 +30,7 @@ def main(argv):
         region_id = region["regionID"]
         print(f"Rendering {region_name} {region_id}")
         nodes, edges = getDataForRegion(cursor, region_name)
+
         G = pgv.AGraph(strict=False, directed=False, overlap=False, splines=True)
         G.graph_attr.update(normalize=True)
         G.graph_attr.update(mode="ipsep")
@@ -53,7 +54,7 @@ def main(argv):
     return 0
 
 def start():
-    main(sys.argv)
+    return main(sys.argv)
 
 if __name__ == "__main__":
     start()

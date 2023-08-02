@@ -1,0 +1,1 @@
+This app takes the geometry data from a SQLite database containing EvE Online's data dump and produces an SVG of the game's regions.
