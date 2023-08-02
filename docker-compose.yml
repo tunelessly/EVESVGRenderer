@@ -4,7 +4,6 @@ services:
   renderer:
     build:
       context: .
-      dockerfile: dockerfile
-      target: final
+      dockerfile: Dockerfile
     volumes:
       - ./output_docker:${APPDIR}/output
