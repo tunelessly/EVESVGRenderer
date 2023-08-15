@@ -17,26 +17,25 @@ ARG targetDownloadDir
 ARG outputDir
 ARG sourceFile
 ARG sourceURL
+# Download the data dump in sqlite format
 RUN mkdir ${targetDownloadDir}
 RUN mkdir ${outputDir}
-# Download the data dump in sqlite format
 WORKDIR ${targetDownloadDir}
 RUN wget --no-verbose --show-progress --progress=dot:giga ${sourceURL}${sourceFile}
 RUN bzip2 -d ${sourceFile}
 COPY ./datadump/* ./
 RUN chmod +x run.sh
 RUN ./run.sh sqlite-latest.sqlite
-RUN ls
 RUN mv ./database_transformed.sqlite3 ${outputDir}/
 RUN rm -rf ${targetDownloadDir}
 # Transform the data into SVG 
+RUN mkdir ${appDir}
 WORKDIR ${appDir}
 RUN pip install poetry
 COPY ./evesvgrenderer/ ./evesvgrenderer/
 COPY ./output/ ./output/
-COPY ./poetry.lock ./pyproject.toml README.md entrypoint.sh ./
+COPY ./poetry.lock ./pyproject.toml README.md ./
 RUN poetry install
-RUN chmod +x entrypoint.sh
 ENV outputDir=${outputDir}
 ENV PYTHONUNBUFFERED=1
 ENTRYPOINT ["sh", "-c", "poetry run start ${outputDir}/database_transformed.sqlite3"]

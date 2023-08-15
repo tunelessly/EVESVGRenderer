@@ -37,10 +37,12 @@ def main(argv):
         G = pgv.AGraph(strict=False, directed=False, overlap=False, splines=True)
         G.graph_attr.update(normalize=True)
         G.graph_attr.update(mode="ipsep")
+        G.graph_attr.update(center="true")
 
         for node in nodes:
             node_region = node["regionID"]
-            node_data = {"id": node["solarSystemName"]}
+            node_name = node["solarSystemName"] if not node["solarSystemName"][0].isdigit() else "_" + node["solarSystemName"]
+            node_data = {"id": node_name}
             if node_region != region_id:
                 node_data = node_data | {"shape": "box"}
             else:
