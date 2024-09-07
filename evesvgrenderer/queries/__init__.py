@@ -86,6 +86,8 @@ regionCoordinatesAndStatusesStandard = f"""
     )
     select
          s.solarSystemName
+        ,c.constellationName
+        ,r.regionName
         ,s.x 
         ,s.y
         ,s.z
@@ -99,6 +101,16 @@ regionCoordinatesAndStatusesStandard = f"""
         systems s
     on
         i.solarSystemID = s.solarSystemID
+    join
+        constellations c
+    on
+        s.constellationID = c.constellationID
+    join
+        regions r
+    on
+        r.regionID = s.regionID
+    order by
+        c.constellationName asc
 """
 
 __all__ = [allRegionNames, regionConnectionsStandard, regionCoordinatesAndStatusesStandard]

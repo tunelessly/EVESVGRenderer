@@ -1,7 +1,7 @@
 import sys
 import sqlite3
 import evesvgrenderer.queries as q
-import pygraphviz as pgv
+import graphviz
 
 def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
@@ -34,27 +34,54 @@ def main(argv):
         print(f"{i}/{count}: Rendering {region_name} {region_id}")
         nodes, edges = getDataForRegion(cursor, region_name)
 
-        G = pgv.AGraph(strict=False, directed=False, overlap=False, splines=True)
-        G.graph_attr.update(normalize=True)
-        G.graph_attr.update(mode="ipsep")
-        G.graph_attr.update(center="true")
+        G = graphviz.Graph(region_name, strict=True, format="svg", engine="sfdp", filename=region_name)
+        # Always desirable parameters
+        G.graph_attr.update(splines="true")
+        G.graph_attr.update(overlap="false")
+        G.graph_attr.update(normalize="true")
+        # Layout engine specific parameters
+        G.graph_attr.update(K="0.1")
+        G.graph_attr.update(repulsiveforce="1.25")
+        G.graph_attr.update(beautify="true")
+        G.graph_attr.update(overlap_scaling="5")
+
+
+
+        current_constellation_name = None
+        constellation_graph = None
 
         for node in nodes:
-            node_region = node["regionID"]
-            node_name = node["solarSystemName"] if not node["solarSystemName"][0].isdigit() else "_" + node["solarSystemName"]
-            node_data = {"id": node_name}
-            if node_region != region_id:
-                node_data = node_data | {"shape": "box"}
-            else:
-                node_data = node_data | {"shape": "ellipse"}
+            node_region_id = node["regionID"]
+            node_constellation_name = node["constellationName"]
 
-            G.add_node(node["solarSystemName"], **node_data)
+            if(node_constellation_name != current_constellation_name):
+
+                current_constellation_name = node_constellation_name
+                constellation_graph = graphviz.Graph(f"{node_constellation_name}")
+                constellation_graph.attr(label=node_constellation_name)
+
+
+            node_name = node["solarSystemName"]
+            node_region = node["regionName"]
+            node_label = None
+            node_shape = None
+
+            # Meaning: it's a system belonging to another region
+            if node_region_id != region_id:
+                node_shape = "ellipse" 
+                node_label = f"<{node_name}<br align=\"center\"/><font point-size=\"10\"><u>{node['regionName']}</u></font><br align=\"center\"/>>"
+            else:
+                node_label = node_name
+                node_shape = "Mrecord" 
+
+            constellation_graph.node(node_name, label=node_label, shape=node_shape, group=node_constellation_name, width="1.5")
+            if(constellation_graph is not None):
+                G.subgraph(constellation_graph)
 
         for edge in edges:
-            G.add_edge(edge["fromSystemName"], edge["toSystemName"])
+            G.edge(edge["fromSystemName"], edge["toSystemName"])
 
-        G.layout(prog='neato')
-        G.draw(f"output/{region_name}.svg")
+        G.render(directory="output/", cleanup=True)
         i+= 1
 
     return 0
